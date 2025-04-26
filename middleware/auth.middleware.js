@@ -9,6 +9,11 @@ export const isauthenticated = (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    if (!decoded.isVerified) {
+      return res.status(403).json({ message: "Please verify your email first." });
+    }
+
     req.user = decoded;
 
     next();
