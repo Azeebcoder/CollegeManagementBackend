@@ -15,7 +15,18 @@ export const registerUser = async (req, res) => {
       city,
       college,
     } = req.body;
-    if (!(username || email || password||rollNo || course || semester || city || college)) {
+    if (
+      !(
+        username ||
+        email ||
+        password ||
+        rollNo ||
+        course ||
+        semester ||
+        city ||
+        college
+      )
+    ) {
       return res
         .status(201)
         .json({ success: false, message: "all fields required" });
@@ -47,8 +58,8 @@ export const registerUser = async (req, res) => {
       });
       res.cookie("token", token, {
         httpOnly: true,
-        secure: false, // Set secure only in production
-        sameSite: "Lax", // Helps with CSRF protection
+        secure: process.env.NODE_ENV === "production", // Set to true in production for HTTPS, false in development
+        sameSite: "None" ,// Helps with CSRF protection
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       });
     } catch (error) {
@@ -97,7 +108,7 @@ export const loginUser = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set secure only in production
-      sameSite: "Strict", // Helps with CSRF protection
+      sameSite: "None", // Helps with CSRF protection
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
