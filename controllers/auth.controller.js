@@ -53,7 +53,7 @@ export const registerUser = async (req, res) => {
     await data.save();
     console.log("data saved successfully");
     try {
-      const token = jwt.sign({ userId: data._id,isVerified:data.isVerified }, process.env.JWT_SECRET_KEY, {
+      const token = jwt.sign({ userId: data._id }, process.env.JWT_SECRET_KEY, {
         expiresIn: "30d",
       });
       res.cookie("token", token, {
