@@ -49,22 +49,20 @@ export const registerUser = async (req, res) => {
       city,
       college,
     });
-
-    await data.save();
-    console.log("data saved successfully");
     try {
       const token = jwt.sign({ userId: data._id }, process.env.JWT_SECRET_KEY, {
         expiresIn: "30d",
       });
       res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // Set to true in production for HTTPS, false in development
+        secure: false,
         sameSite: "None" ,// Helps with CSRF protection
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       });
     } catch (error) {
       console.log("error in sending email", error);
     }
+    await data.save();
     res.status(200).json({
       success: true,
       message: "data saved successfully",
@@ -106,10 +104,10 @@ export const loginUser = async (req, res) => {
     });
 
     res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Set secure only in production
-      sameSite: "None", // Helps with CSRF protection
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+     httpOnly: true,
+        secure: false,
+        sameSite: "None" ,// Helps with CSRF protection
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
     res.status(200).json({
@@ -121,6 +119,21 @@ export const loginUser = async (req, res) => {
     res.status(404).json({ success: false, message: error.message });
   }
 };
+
+export const logoutUser = async (req, res) => {
+
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+        secure: false,
+        sameSite: "None" ,// Helps with CSRF protection
+    });
+    res.status(200).json({ success: true, message: "Logout Successful" });
+    
+  } catch (error) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+}
 
 export const sendEmailOtp = async (req, res) => {
   const { userId } = req.user;
@@ -318,9 +331,26 @@ export const verifyResetOtp = async (req, res) => {
 };
 
 export const isValidUser = async (req, res) => {
+  const userId = req.user.userId;
   try {
-    res.status(200).json({ success: true, message: "User is authentacited" });
-  } catch (error) {
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Please provide a user ID" });
+    }
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+    if(!user.isVerified){
+      return res.status(200).json({ success: false, message: "User is not verified" });
+    }
+    res.status(200).json({ success: true, message: "User is valid" });
+  }
+  catch (error) {
     res.status(404).json({ success: false, message: error.message });
   }
 };
