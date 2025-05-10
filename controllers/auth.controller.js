@@ -56,7 +56,7 @@ export const registerUser = async (req, res) => {
       res.cookie("token", token, {
         httpOnly: true,
         secure: false,
-        sameSite: "None" ,// Helps with CSRF protection
+        sameSite: "Lax" ,// Helps with CSRF protection
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       });
     } catch (error) {
@@ -106,7 +106,7 @@ export const loginUser = async (req, res) => {
     res.cookie("token", token, {
      httpOnly: true,
         secure: false,
-        sameSite: "None" ,// Helps with CSRF protection
+        sameSite: "Lax" ,// Helps with CSRF protection
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
@@ -126,7 +126,7 @@ export const logoutUser = async (req, res) => {
     res.clearCookie("token", {
       httpOnly: true,
         secure: false,
-        sameSite: "None" ,// Helps with CSRF protection
+        sameSite: "Lax" ,// Helps with CSRF protection
     });
     res.status(200).json({ success: true, message: "Logout Successful" });
     
