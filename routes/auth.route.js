@@ -9,8 +9,8 @@ router.post('/login',loginUser);
 router.get('/logout',isauthenticated,logoutUser)
 router.get('/send-email',isauthenticated,sendEmailOtp);
 router.post('/verify-otp',isauthenticated,verifyEmailOtp);
-router.post('/reset-otp-send',isauthenticated,resetOtpSend);
-router.post('/verify-reset-otp',isauthenticated,verifyResetOtp);
+router.post('/reset-otp-send',resetOtpSend);
+router.post('/verify-reset-otp',verifyResetOtp);
 router.get('/is-authentacited',isauthenticated,isValidUser)
 
 export default router;

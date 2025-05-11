@@ -226,18 +226,15 @@ export const verifyEmailOtp = async (req, res) => {
 };
 
 export const resetOtpSend = async (req, res) => {
-  const { userId } = req.user;
   const { email } = req.body;
 
-  if (!userId && !email) {
+  if (!email) {
     return res
       .status(400)
       .json({ success: false, message: "Please provide a email" });
   }
   try {
-    const user = !email
-      ? await userModel.findById(userId)
-      : await userModel.findOne({ email });
+    const user = await userModel.findOne({ email });
     if (!user) {
       return res
         .status(404)
@@ -277,7 +274,6 @@ export const resetOtpSend = async (req, res) => {
     };
 
     await transporter.sendMail(sendEmailOptions);
-    console.log("Email sent successfully");
 
     res.status(200).json({ success: true, message: "OTP sent successfully" });
   } catch (error) {
@@ -287,26 +283,28 @@ export const resetOtpSend = async (req, res) => {
 };
 
 export const verifyResetOtp = async (req, res) => {
-  const { email, otp, password } = req.body;
-  const { userId } = req.user;
-  if (!userId && !email) {
+  const {email, otp, password,confirmPassword } = req.body;
+  if (!email) {
     return res
       .status(201)
       .json({ success: false, message: "please Provide email" });
   }
   try {
-    if (!email || !otp || !password) {
+    if (!otp || !password || !confirmPassword) {
       return res
         .status(500)
         .json({ success: false, message: "Provide all details" });
     }
-    const user = !email
-      ? await userModel.findById(userId)
-      : await userModel.findOne({ email });
+    const user = await userModel.findOne({ email });
     if (!user) {
       return res
         .status(404)
         .json({ success: false, message: "user not found" });
+    }
+    if (password !== confirmPassword) {
+      return res
+        .status(404)
+        .json({ success: false, message: "password not matched" });
     }
     if (user.verifyOtpExpiresAt < Date.now()) {
       return res.status(404).json({ success: false, message: "otp expired" });
