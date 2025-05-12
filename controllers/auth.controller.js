@@ -2,6 +2,7 @@ import userModel from "../model/user.model.js";
 import bcrypt from "bcrypt";
 import { transporter } from "../config/nodemailer.config.js";
 import jwt from "jsonwebtoken";
+import validator from "validator";
 
 export const registerUser = async (req, res) => {
   try {
@@ -15,6 +16,13 @@ export const registerUser = async (req, res) => {
       city,
       college,
     } = req.body;
+
+    if (!validator.isEmail(email)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid email format" });
+    }
+
     if (
       !(
         username ||
@@ -56,7 +64,7 @@ export const registerUser = async (req, res) => {
       res.cookie("token", token, {
         httpOnly: true,
         secure: true,
-        sameSite: "None" ,// Helps with CSRF protection
+        sameSite: "None", // Helps with CSRF protection
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       });
     } catch (error) {
@@ -104,10 +112,10 @@ export const loginUser = async (req, res) => {
     });
 
     res.cookie("token", token, {
-     httpOnly: true,
-        secure: true,
-        sameSite: "None" ,// Helps with CSRF protection
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      httpOnly: true,
+      secure: true,
+      sameSite: "None", // Helps with CSRF protection
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
     res.status(200).json({
@@ -121,19 +129,17 @@ export const loginUser = async (req, res) => {
 };
 
 export const logoutUser = async (req, res) => {
-
   try {
     res.clearCookie("token", {
       httpOnly: true,
-        secure: true,
-        sameSite: "None" ,// Helps with CSRF protection
+      secure: true,
+      sameSite: "None", // Helps with CSRF protection
     });
     res.status(200).json({ success: true, message: "Logout Successful" });
-    
   } catch (error) {
     res.status(404).json({ success: false, message: error.message });
   }
-}
+};
 
 export const sendEmailOtp = async (req, res) => {
   const { userId } = req.user;
@@ -283,7 +289,7 @@ export const resetOtpSend = async (req, res) => {
 };
 
 export const verifyResetOtp = async (req, res) => {
-  const {email, otp, password,confirmPassword } = req.body;
+  const { email, otp, password, confirmPassword } = req.body;
   if (!email) {
     return res
       .status(201)
@@ -343,12 +349,13 @@ export const isValidUser = async (req, res) => {
         .status(404)
         .json({ success: false, message: "User not found" });
     }
-    if(!user.isVerified){
-      return res.status(200).json({ success: false, message: "User is not verified" });
+    if (!user.isVerified) {
+      return res
+        .status(200)
+        .json({ success: false, message: "User is not verified" });
     }
     res.status(200).json({ success: true, message: "User is valid" });
-  }
-  catch (error) {
+  } catch (error) {
     res.status(404).json({ success: false, message: error.message });
   }
 };

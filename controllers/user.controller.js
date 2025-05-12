@@ -33,11 +33,12 @@ export const updateUserInfo = async (req,res) => {
         if(!user){
             return res.status(201).json({success:false,message:"User not found"});
         }
-        const {course,semester,city,college} = req.body;
-        if(!course || !semester || !city || !college){
+        const {username,course,semester,city,college} = req.body;
+        if(!username ||!course || !semester || !city || !college){
             return res.status(201).json({success:false,message:"Please fill all the fields"});
         }
         const updatedUser = await userModel.findByIdAndUpdate(userId,{
+            username,
             course,
             semester,
             city,
@@ -50,6 +51,7 @@ export const updateUserInfo = async (req,res) => {
             success:true,
             message:"User updated successfully",
             user:{
+                name:updatedUser.username,
                 course:updatedUser.course,
                 semester:updatedUser.semester,
                 city:updatedUser.city,
