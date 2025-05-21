@@ -10,24 +10,6 @@ export const getAllUsers = async (req, res) => {
     }
 }
 
-export const getOneUser = async (req,res) => {
-    try {
-        const userId = req.params.userId;
-        const singleUser = await User.findById(userId).select('-password -__v');
-        
-        if(!singleUser){
-            res.status(500).json({success:false,message :'User Not Found'});
-            return
-        }
-        res.status(200).json({success:true,message:'user found successfully',data:singleUser})
-        return;
-
-
-    } catch (error) {
-        res.status(500).json({ success:false, message: 'Internal server error' })
-    }
-}
-
 export const deleteUser = async (req,res) => {
     try {
         const userId = req.params.userId;
